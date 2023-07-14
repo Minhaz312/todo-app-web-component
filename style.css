@@ -233,6 +233,9 @@ body{
 @media screen and (max-width:1210px){
   .container {
       transform: scale(0.9);
+      width: 90%;
+      max-height: 90vh;
+      height: auto;
   }
   .logo-container {
       margin-bottom: 0px;
