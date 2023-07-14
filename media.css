@@ -1,0 +1,8 @@
+@media screen and (max-width:1210px){
+    .container {
+        transform: scale(0.9);
+    }
+    .logo-container {
+        margin-bottom: 0px;
+    }
+}

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TODO APP</title>
+    <link rel="shortcut icon" href="/images/todo-logo.png" type="image/x-icon">
+    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./media.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,300;1,700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="wrapper">
+        <div>
+            <div class="logo-container">
+                <img src="/images/todo-logo.png" height="100px" style="position: absolute;" />
+                <div><span style="width:500px;height:5px;background:white;display: block;"></span>
+                    <span style="width:500px;height:5px;margin-top:5px;background:white;display: block;"></span>
+                </div>
+            </div>
+            <div class="container">
+                <img src="/images/todo-logo.png" class="todo-logo" />
+                <div class="input-wrapper">
+                    <div style="display: flex;flex-direction: column;">
+                        <input type="text" id="todo-inpt" class="todo-inpt" placeholder="Add New Todo" />
+                        <span class="todo-inpt-err d-none">asdf</span>
+                    </div>
+                    <cs-button>+</cs-button>
+                </div>
+                <div style="display: block;width: 100%;margin-top: 3rem;height:500px;overflow-y: auto;" id="todolist">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="./index.js"></script>
+    <script>
+        
+        document.querySelector("cs-button").addEventListener("click",()=>{
+            const todoValue = document.querySelector("#todo-inpt").value;
+            let prevList = localStorage.getItem("todo-list")
+            let newItem = JSON.stringify({name:todoValue,date: Date.now().toString(),done:"false"});
+            let proceed = true;
+            if(prevList==null || prevList==""){
+                prevList = newItem
+            }else if(prevList.includes(todoValue)){
+                const todoInpt = document.getElementById("todo-inpt").style
+                const todoExistErrElemnt = document.getElementsByClassName("todo-inpt-err")[0];
+                todoExistErrElemnt.classList.remove("d-none")
+                todoExistErrElemnt.innerHTML = "Todo already added"
+                todoInpt.border = "1px solid rgb(174, 0, 0)"
+                setTimeout(()=>{
+                    todoInpt.border = "1px solid transparent"
+                    todoExistErrElemnt.classList.add("d-none")
+                },[2000])
+                proceed = false
+            }else {
+                prevList = prevList.concat("/",newItem)
+            }
+            if(proceed){
+                localStorage.setItem("todo-list",`${prevList}`)
+            }
+            getAllTodos()
+        })
+        function getAllTodos() {
+            const todoStorageList = localStorage.getItem("todo-list")
+            let todoList = []
+            if(todoStorageList!=null){
+                todoList = todoStorageList.split("/")
+            }
+            document.getElementById("todolist").innerHTML = ""
+            if(todoStorageList!=null){
+                todoList.map(item=>{
+                data = JSON.parse(item)
+                const p = document.createElement("p").inn
+                document.getElementById("todolist").innerHTML = document.getElementById("todolist").innerHTML + `<todo-item class="${data.done=="true"?"todo-done":""}" done="${data.done}">
+                        <span slot="t-name">${data.name}</span>
+                        <span slot="t-date">${new Date(Number(data.date)).toLocaleDateString()}</span>
+                        <span slot="t-status" class="status ${data.done=="true"?"success":"danger"}">${data.done=="true"?"Done":"Pending"}
+                        </span>
+                        <span slot="t-action">
+                            <button class="update-btn" style="display:${data.done=="true"?"none":"inline-block"}" data-name="${data.name}">
+                                <img src="/images/done-icon.webp" height="20px" />
+                            </button>    
+                            <button class="delete-btn" data-name="${data.name}">
+                                <img src="/images/trash.svg" height="20px" />
+                            </button>    
+                        </span>
+                    </todo-item>`
+            })
+            }
+            const deleteBtn = document.getElementsByClassName("delete-btn")
+            const updtBtn = document.getElementsByClassName("update-btn")
+            
+            deleteTodo(deleteBtn,todoList)
+            updateTodo(updtBtn,todoList)
+        }
+        function deleteTodo(deleteBtn,todoList){
+            for (let i = 0; i < deleteBtn.length; i++) {
+                deleteBtn[i].addEventListener("click",(e)=>{
+                    let newList = ""
+                    document.querySelectorAll("todo-item")[i].classList.add("delete-animation")
+                    const deleteItemName = deleteBtn[i].getAttribute("data-name");
+                    todoList.map(item=>{
+                        console.log("deleteItemName: ",deleteItemName)
+                        console.log("JSON.parse(item).name: ",JSON.parse(item).name)
+                        if(JSON.parse(item).name!=deleteItemName){
+                            console.log("checking... false")
+                            newList = newList+item+"/"
+                        }else{
+                            console.log("checking... true")
+                        }
+                    })
+                    localStorage.removeItem("todo-list")
+                    localStorage.setItem("todo-list",`${newList.substring(0,newList.length-1)}`)
+                    setTimeout(()=>{
+                        getAllTodos()
+                    },1100)
+                })
+            }
+        }
+        function updateTodo(updtBtn,todoList) {
+            for (let i = 0; i < updtBtn.length; i++) {
+                updtBtn[i].addEventListener("click",(e)=>{
+                    let newList = ""
+                    const updateItemName = updtBtn[i].getAttribute("data-name");
+                    todoList.map((item,i)=>{
+                        const itemData = JSON.parse(item)
+                        if(itemData.name===updateItemName){
+                            if(i==0){
+                                newList += "/"+JSON.stringify({name:itemData.name,date:itemData.date,done:"true"})+"/"
+                            }else{
+                                newList += JSON.stringify({name:itemData.name,date:itemData.date,done:"true"})+"/"
+                            }
+                        }else{
+                            newList += item+"/"
+                        }
+                    })
+                    if(newList.charAt(0)==="/"){
+                        newList = newList.substring(1)
+                    }
+                    if(newList.charAt(newList.length-1)==="/"){
+                        newList = newList.substring(0,newList.length-1)
+                    }
+                    console.log(newList)
+                    localStorage.removeItem("todo-list")
+                    localStorage.setItem("todo-list",newList)
+                    getAllTodos()
+                })
+            }
+        }
+        getAllTodos()
+        
+    </script>
+</body>
+</html>
