@@ -40,48 +40,65 @@ class CsButton extends HTMLElement {
 const template = document.createElement("template")
 template.innerHTML = `
         <style>
-            div {
+            .wrapper {
                 font-family:arial;
-                display:flex;
+                display:flex !important;
+                column-gap:10px;
                 align-items:center;
                 margin-bottom:1rem;
                 padding:1.25rem;
-                justify-content:between;
+                justify-content:space-between;
                 background:rgb(250,250,250);
                 border:1px solid transparent;
                 transition: 0.33s;
                 font-family: 'Poppins', sans-serif;
             }
-            div:hover {
+            .wrapper:hover {
                 border:10px solid #287098 90%;
                 box-shadow: 0.1px 0.1px 10px rgb(180,200,200);
             }
-            span{
-                width:15%;
+            .wrapper div {
+                flex:1;
+                display:flex !important;
             }
-            span:nth-child(1){
-                width:300px;
+            .wrapper div:nth-child(1) {
+                flex-basis:50%;
+                justify-content:space-between !important;
             }
-            span:nth-child(2){
-                width:150px;
+            .wrapper div:nth-child(2) {
+                justify-content:space-around !important;
             }
-            span:nth-child(3){
-                width:100px;
-            }          
+            @media screen and (max-width:500px){
+                .wrapper{
+                    display:block !important;
+                }
+                .wrapper div:nth-child(1) {
+                   margin-bottom: 15px;
+                }
+                .wrapper div:nth-child(2) {
+                    display:flex !important;
+                    justify-content:space-between !important;
+                }
+                
+            }        
         </style>
-        <div>
-            <span>
-                <slot name="t-name"></slot>
-            </span>
-            <span>
-                <slot name="t-date"></slot>
-            </span>
-            <span>
-                <slot name="t-status"></slot>
-            </span>
-            <span>
-                <slot name="t-action"></slot>
-            </span>
+        <div class="wrapper">
+            <div>
+                <span>
+                    <slot name="t-name"></slot>
+                </span>
+                <span>
+                    <slot name="t-date"></slot>
+                </span>
+            </div>
+            <div>
+                <span>
+                    <slot name="t-status"></slot>
+                </span>
+                <span>
+                    <slot name="t-action"></slot>
+                </span>
+            </div>
         </div>
     `
 class TodoItem extends HTMLElement {
